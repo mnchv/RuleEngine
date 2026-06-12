@@ -1,0 +1,7 @@
+{
+  "logicalOperation": "all",
+  "criteria": [
+    { "field": "age", "operator": "gte", "value": 18 },
+    { "field": "total", "operator": "gt", "value": 100 }
+  ]
+}
