@@ -1,5 +1,6 @@
 package dev.zetta.interview.RuleEngine.rules.engine.condition;
 
+import dev.zetta.interview.RuleEngine.exceptions.ConditionEvaluationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
@@ -17,33 +18,41 @@ public class ConditionEngine {
     @Value("${app.conditions.path}")
     private File conditionsFile;
 
-    private Condition readCondition() {
+    private Condition readConditions() {
         JsonNode conditions = objectMapper.readTree(conditionsFile);
         return objectMapper.treeToValue(conditions, Condition.class);
     }
 
     public boolean evaluate(JsonNode input) {
-        Condition condition = readCondition();
-        return switch (condition.getLogicalOperation()) {
-            case "all" ->
-                    Arrays.stream(condition.getCriteria()).allMatch(criteria -> compareValues(criteria, input.get(criteria.getField()).asString(), criteria.getValue()));
-            case "any" ->
-                    Arrays.stream(condition.getCriteria()).anyMatch(criteria -> compareValues(criteria, input.get(criteria.getField()).asString(), criteria.getValue()));
-            case "none" ->
-                    Arrays.stream(condition.getCriteria()).noneMatch(criteria -> compareValues(criteria, input.get(criteria.getField()).asString(), criteria.getValue()));
-            default -> throw new IllegalArgumentException("Unexpected operator: " + condition.getLogicalOperation());
+        return evaluate(readConditions(), input);
+    }
+
+    private boolean evaluate(Condition condition, JsonNode input) {
+        if (!condition.isNested()) return compareValues(condition, input);
+
+        return switch (condition.getLogicalOperator()) {
+            case "all" -> Arrays.stream(condition.getConditions()).allMatch(c -> evaluate(c, input));
+            case "any" -> Arrays.stream(condition.getConditions()).anyMatch(c -> evaluate(c, input));
+            case "none" -> Arrays.stream(condition.getConditions()).noneMatch(c -> evaluate(c, input));
+            default -> throw new ConditionEvaluationException("Unexpected logical operator: " + condition.getLogicalOperator());
         };
     }
 
-    private boolean compareValues(Criteria criteria, String actual, String expected) {
-       return switch (criteria.getOperator()) {
-           case "eq" -> Objects.equals(actual, expected);
-           case "neq" -> !Objects.equals(actual, expected);
-           case "gt" -> Long.parseLong(actual) > Long.parseLong(expected);
-           case "gte" -> Long.parseLong(actual) >= Long.parseLong(expected);
-           case "lt" -> Long.parseLong(actual) < Long.parseLong(expected);
-           case "lte" -> Long.parseLong(actual) <= Long.parseLong(expected);
-           default -> throw new IllegalStateException("Unexpected value: " + criteria.getOperator());
-       };
+    private boolean compareValues(Condition condition, JsonNode input) {
+        JsonNode value = input.get(condition.getField());
+        if (value == null) throw new ConditionEvaluationException("Field expected, but missing from input: " + condition.getField());
+
+        String actualValue = value.asString();
+        String expectedValue = condition.getValue();
+
+        return switch (condition.getOperator()) {
+            case "==" -> Objects.equals(actualValue, expectedValue);
+            case "!==" -> !Objects.equals(actualValue, expectedValue);
+            case ">" -> Long.parseLong(actualValue) > Long.parseLong(expectedValue);
+            case ">=" -> Long.parseLong(actualValue) >= Long.parseLong(expectedValue);
+            case "<" -> Long.parseLong(actualValue) < Long.parseLong(expectedValue);
+            case "<=" -> Long.parseLong(actualValue) <= Long.parseLong(expectedValue);
+            default -> throw new ConditionEvaluationException("Unexpected value: " + condition.getOperator());
+        };
     }
 }

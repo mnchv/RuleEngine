@@ -6,6 +6,14 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Condition {
-    private String logicalOperation;
-    private Criteria[] criteria;
+    private String logicalOperator;
+    private Condition[] conditions;
+
+    private String field;
+    private String operator;
+    private String value;
+
+    public boolean isNested() {
+        return getLogicalOperator() != null;
+    }
 }

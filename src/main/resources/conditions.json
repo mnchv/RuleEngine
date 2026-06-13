@@ -1,7 +1,25 @@
 {
-  "logicalOperation": "all",
-  "criteria": [
-    { "field": "age", "operator": "gte", "value": 18 },
-    { "field": "total", "operator": "gt", "value": 100 }
+  "logicalOperator": "all",
+  "conditions": [
+    {
+      "field": "age",
+      "operator": ">=",
+      "value": 18
+    },
+    {
+      "logicalOperator": "any",
+      "conditions": [
+        {
+          "field": "total",
+          "operator": "==",
+          "value": 50
+        },
+        {
+          "field": "total",
+          "operator": "==",
+          "value": 100
+        }
+      ]
+    }
   ]
 }
