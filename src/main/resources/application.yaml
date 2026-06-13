@@ -17,3 +17,6 @@ app:
   conditions:
     enabled: true
     path: classpath:conditions.json
+  transformations:
+    enabled: true
+    path: classpath:transformations.json

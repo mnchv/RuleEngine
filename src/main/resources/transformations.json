@@ -1,0 +1,38 @@
+[
+  {
+    "operation": "add",
+    "target": "user.fullName",
+    "expression": {
+      "function": "concat",
+      "args": [
+        "user.firstName",
+        "user.lastName"
+      ]
+    }
+  },
+  {
+    "operation": "update",
+    "target": "user.age",
+    "expression": {
+      "function": "add",
+      "args": [
+        "user.age",
+        1
+      ]
+    }
+  },
+  {
+    "operation": "remove",
+    "target": "user.firstName"
+  },
+  {
+    "operation": "update",
+    "target": "user.age",
+    "expression": {
+      "function": "replace",
+      "args": [
+        22
+      ]
+    }
+  }
+]

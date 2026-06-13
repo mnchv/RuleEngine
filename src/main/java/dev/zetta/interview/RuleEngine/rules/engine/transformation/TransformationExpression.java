@@ -1,0 +1,64 @@
+package dev.zetta.interview.RuleEngine.rules.engine.transformation;
+
+import lombok.Getter;
+import lombok.Setter;
+import tools.jackson.databind.node.ObjectNode;
+
+import java.util.List;
+import java.util.ListIterator;
+
+@Getter
+@Setter
+public class TransformationExpression {
+    private String function;
+    private List<Object> args;
+
+    public String add(ObjectNode input) {
+        long currentValue = input.at(mapToJsonPath(args.getFirst())).asLong();
+        long newValue = ((Number) args.getLast()).longValue();
+        return String.valueOf(currentValue + newValue);
+    }
+
+    public String subtract(ObjectNode input) {
+        long currentValue = input.at(mapToJsonPath(args.getFirst())).asLong();
+        long newValue = ((Number) args.getLast()).longValue();
+        return String.valueOf(currentValue - newValue);
+    }
+
+    public String multiply(ObjectNode input) {
+        long currentValue = input.at(mapToJsonPath(args.getFirst())).asLong();
+        long newValue = ((Number) args.getLast()).longValue();
+        return String.valueOf(currentValue * newValue);
+    }
+
+    public String divide(ObjectNode input) {
+        long currentValue = input.at(mapToJsonPath(args.getFirst())).asLong();
+        long newValue = ((Number) args.getLast()).longValue();
+        return String.valueOf(currentValue / newValue);
+    }
+
+    public String concat(ObjectNode input) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        ListIterator<Object> listIterator = args.listIterator();
+        while (listIterator.hasNext()) {
+            String value = input.at(mapToJsonPath(listIterator.next())).asString();
+            stringBuilder.append(value);
+            if (listIterator.hasNext()) stringBuilder.append(" ");
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public String uppercase(ObjectNode input) {
+        return input.at(mapToJsonPath(args.getFirst())).asString().toUpperCase();
+    }
+
+    public String lowercase(ObjectNode input) {
+        return input.at(mapToJsonPath(args.getFirst())).asString().toLowerCase();
+    }
+
+    private String mapToJsonPath(Object path) {
+        return "/" + path.toString().replace(".", "/");
+    }
+}
