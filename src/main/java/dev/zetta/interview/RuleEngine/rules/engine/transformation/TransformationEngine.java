@@ -1,5 +1,7 @@
 package dev.zetta.interview.RuleEngine.rules.engine.transformation;
 
+import dev.zetta.interview.RuleEngine.exceptions.TransformationApplyException;
+import dev.zetta.interview.RuleEngine.exceptions.TransformationExpressionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
@@ -32,8 +34,15 @@ public class TransformationEngine {
 
     private void apply(Transformation transformation, ObjectNode input) {
         switch (transformation.getOperation()) {
-            case "add", "update":
+            case "put":
                 insertValueAtTargetPath(
+                        input,
+                        transformation.getTarget(),
+                        resolveExpression(transformation.getExpression(), input)
+                );
+                break;
+            case "update":
+                updateValueAtTargetPath(
                         input,
                         transformation.getTarget(),
                         resolveExpression(transformation.getExpression(), input)
@@ -46,7 +55,7 @@ public class TransformationEngine {
                 );
                 break;
             default:
-                throw new IllegalArgumentException("Unexpected operation: " + transformation.getOperation());
+                throw new TransformationApplyException("Unexpected operation: " + transformation.getOperation());
         }
     }
 
@@ -60,7 +69,7 @@ public class TransformationEngine {
             case "concat" -> expression.concat(input);
             case "uppercase" -> expression.uppercase(input);
             case "lowercase" -> expression.lowercase(input);
-            default -> throw new IllegalStateException("Unexpected expression function: " + expression.getFunction());
+            default -> throw new TransformationExpressionException("Unexpected expression function: " + expression.getFunction());
         };
     }
 
@@ -70,6 +79,18 @@ public class TransformationEngine {
         for (int i = 0; i < nodes.length - 1; i++) {
             rootNode = rootNode.withObject(nodes[i]);
         }
+        rootNode.put(nodes[nodes.length - 1], value);
+    }
+
+    private void updateValueAtTargetPath(ObjectNode root, String path, String value) {
+        String[] nodes = path.split("\\.");
+        ObjectNode rootNode = root;
+        for (int i = 0; i < nodes.length - 1; i++) {
+            rootNode = rootNode.withObject(nodes[i]);
+        }
+
+        if (rootNode.get(nodes[nodes.length - 1]) == null)
+            throw new TransformationApplyException("Can't update non existant field: " + nodes[nodes.length - 1]);
         rootNode.put(nodes[nodes.length - 1], value);
     }
 

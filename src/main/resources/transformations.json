@@ -1,6 +1,6 @@
 [
   {
-    "operation": "add",
+    "operation": "put",
     "target": "user.fullName",
     "expression": {
       "function": "concat",
@@ -12,7 +12,7 @@
   },
   {
     "operation": "update",
-    "target": "user.age",
+    "target": "user.address",
     "expression": {
       "function": "add",
       "args": [
