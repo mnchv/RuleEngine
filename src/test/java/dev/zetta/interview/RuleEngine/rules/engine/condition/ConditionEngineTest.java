@@ -57,15 +57,6 @@ public class ConditionEngineTest {
                 }
                 """;
 
-        Condition simpleCondition = new Condition();
-        simpleCondition.setField("user.age");
-        simpleCondition.setOperator(">");
-        simpleCondition.setValue("18");
-
-        Condition evaluation = new Condition();
-        evaluation.setLogicalOperator("all");
-        evaluation.setConditions(new Condition[]{simpleCondition});
-
-        assertFalse(conditionEngine.evaluate(evaluation, objectMapper.readTree(message)));
+        assertFalse(conditionEngine.evaluate(allowUserAgeOver18(), objectMapper.readTree(message)));
     }
 }

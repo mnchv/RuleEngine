@@ -31,8 +31,6 @@ app:
     input-topic: input
     output-topic: output
   conditions:
-    enabled: true
-    path: classpath:conditions.json
+    path: classpath:rules/conditions.json
   transformations:
-    enabled: true
-    path: classpath:transformations.json
+    path: classpath:rules/transformations.json
