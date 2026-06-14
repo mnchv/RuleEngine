@@ -2,6 +2,7 @@ package dev.zetta.interview.RuleEngine.rules.engine.transformation;
 
 import dev.zetta.interview.RuleEngine.exceptions.TransformationApplyException;
 import dev.zetta.interview.RuleEngine.exceptions.TransformationExpressionException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.File;
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class TransformationEngine {
 
@@ -25,7 +27,7 @@ public class TransformationEngine {
     }
 
     public JsonNode transform(JsonNode inputMessage) throws IOException {
-        System.out.println("Proceeding with message transformation...");
+        log.info("Proceeding with message transformation...");
 
         for (Transformation transformation : readTransformations()) apply(transformation, (ObjectNode) inputMessage);
 
@@ -33,7 +35,7 @@ public class TransformationEngine {
     }
 
     public JsonNode transform(JsonNode inputMessage, Transformation[] transformations) {
-        System.out.println("Proceeding with message transformation...");
+        log.info("Proceeding with message transformation...");
 
         for (Transformation transformation : transformations) apply(transformation, (ObjectNode) inputMessage);
 

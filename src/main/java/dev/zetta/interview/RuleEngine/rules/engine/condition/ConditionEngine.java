@@ -1,6 +1,7 @@
 package dev.zetta.interview.RuleEngine.rules.engine.condition;
 
 import dev.zetta.interview.RuleEngine.exceptions.ConditionEvaluationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
+@Slf4j
 @Component
 public class ConditionEngine {
 
@@ -25,7 +27,7 @@ public class ConditionEngine {
     }
 
     public boolean evaluate(JsonNode input) throws IOException {
-        System.out.println("Evaluating message body...");
+        log.info("Evaluating message body...");
         return evaluate(readConditions(), input);
     }
 

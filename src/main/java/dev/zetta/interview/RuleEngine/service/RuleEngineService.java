@@ -5,6 +5,7 @@ import dev.zetta.interview.RuleEngine.exceptions.MessageEvaluationException;
 import dev.zetta.interview.RuleEngine.rules.engine.condition.ConditionEngine;
 import dev.zetta.interview.RuleEngine.rules.engine.transformation.TransformationEngine;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RuleEngineService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -27,7 +29,7 @@ public class RuleEngineService {
 
     @KafkaListener(topics = "${app.kafka.input-topic}", groupId = "default")
     public void onMessageReceive(String message) throws IOException {
-        System.out.println("Message received: \n" + message);
+        log.info("Message received: \n{}", message);
         JsonNode inputMessage = objectMapper.readTree(message);
 
         JsonNode outputMessage = conditionEngine.evaluate(inputMessage) ? transformationEngine.transform(inputMessage) : null;
@@ -36,7 +38,7 @@ public class RuleEngineService {
             persistenceService.save(outputMessage);
 
             kafkaTemplate.send(kafkaTopicProperties.outputTopic(), outputMessage.toString());
-            System.out.println("Message sent to output topic: \n" + outputMessage.toPrettyString());
+            log.info("Message sent to output topic: \n{}", outputMessage.toPrettyString());
         } else {
             throw new MessageEvaluationException("Message body did non pass evaluation test");
         }
