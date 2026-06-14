@@ -1,11 +1,12 @@
 package dev.zetta.interview.RuleEngine.rules.engine.transformation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class TransformationEngineTest {
     }
 
     @Test
-    void transformationShouldTransformAsExpected() {
+    void transformationShouldTransformAsExpected() throws JsonProcessingException {
         String inputMessage = """
                 {
                   "user": {

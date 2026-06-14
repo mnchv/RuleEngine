@@ -1,10 +1,11 @@
 package dev.zetta.interview.RuleEngine.rules.engine.condition;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,7 +32,7 @@ public class ConditionEngineTest {
     }
 
     @Test
-    void conditionShouldReturnTrue() {
+    void conditionShouldReturnTrue() throws JsonProcessingException {
         String message = """
                 {
                   "user": {
@@ -46,7 +47,7 @@ public class ConditionEngineTest {
     }
 
     @Test
-    void conditionShouldReturnFalse() {
+    void conditionShouldReturnFalse() throws JsonProcessingException {
         String message = """
                 {
                   "user": {

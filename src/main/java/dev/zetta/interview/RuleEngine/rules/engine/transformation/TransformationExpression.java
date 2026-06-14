@@ -2,7 +2,7 @@ package dev.zetta.interview.RuleEngine.rules.engine.transformation;
 
 import lombok.Getter;
 import lombok.Setter;
-import tools.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -42,7 +42,7 @@ public class TransformationExpression {
 
         ListIterator<Object> listIterator = args.listIterator();
         while (listIterator.hasNext()) {
-            String value = input.at(mapToJsonPath(listIterator.next())).asString();
+            String value = input.at(mapToJsonPath(listIterator.next())).asText();
             stringBuilder.append(value);
             if (listIterator.hasNext()) stringBuilder.append(" ");
         }
@@ -51,11 +51,11 @@ public class TransformationExpression {
     }
 
     public String uppercase(ObjectNode input) {
-        return input.at(mapToJsonPath(args.getFirst())).asString().toUpperCase();
+        return input.at(mapToJsonPath(args.getFirst())).asText().toUpperCase();
     }
 
     public String lowercase(ObjectNode input) {
-        return input.at(mapToJsonPath(args.getFirst())).asString().toLowerCase();
+        return input.at(mapToJsonPath(args.getFirst())).asText().toLowerCase();
     }
 
     private String mapToJsonPath(Object path) {

@@ -4,11 +4,12 @@ import dev.zetta.interview.RuleEngine.exceptions.TransformationApplyException;
 import dev.zetta.interview.RuleEngine.exceptions.TransformationExpressionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.File;
+import java.io.IOException;
 
 @Component
 public class TransformationEngine {
@@ -18,12 +19,12 @@ public class TransformationEngine {
     @Value("${app.transformations.path}")
     private File transformationsFile;
 
-    private Transformation[] readTransformations() {
+    private Transformation[] readTransformations() throws IOException {
         JsonNode transformations = objectMapper.readTree(transformationsFile);
         return objectMapper.treeToValue(transformations, Transformation[].class);
     }
 
-    public JsonNode transform(JsonNode inputMessage) {
+    public JsonNode transform(JsonNode inputMessage) throws IOException {
         System.out.println("Proceeding with message transformation...");
 
         for (Transformation transformation : readTransformations()) apply(transformation, (ObjectNode) inputMessage);

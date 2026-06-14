@@ -8,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class RuleEngineService {
     private final KafkaTopicProperties kafkaTopicProperties;
 
     @KafkaListener(topics = "${app.kafka.input-topic}", groupId = "default")
-    public void onMessageReceive(String message) {
+    public void onMessageReceive(String message) throws IOException {
         System.out.println("Message received: \n" + message);
         JsonNode inputMessage = objectMapper.readTree(message);
 

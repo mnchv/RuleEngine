@@ -3,10 +3,11 @@ package dev.zetta.interview.RuleEngine.rules.engine.condition;
 import dev.zetta.interview.RuleEngine.exceptions.ConditionEvaluationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -18,12 +19,12 @@ public class ConditionEngine {
     @Value("${app.conditions.path}")
     private File conditionsFile;
 
-    private Condition readConditions() {
+    private Condition readConditions() throws IOException {
         JsonNode conditions = objectMapper.readTree(conditionsFile);
         return objectMapper.treeToValue(conditions, Condition.class);
     }
 
-    public boolean evaluate(JsonNode input) {
+    public boolean evaluate(JsonNode input) throws IOException {
         System.out.println("Evaluating message body...");
         return evaluate(readConditions(), input);
     }
@@ -43,7 +44,7 @@ public class ConditionEngine {
         JsonNode inputMessageField = inputMessage.at(mapToJsonPath(condition.getField()));
         if (inputMessageField == null) throw new ConditionEvaluationException("Field expected, but missing from input message: " + condition.getField());
 
-        String currentValue = inputMessageField.asString();
+        String currentValue = inputMessageField.asText();
         String compareValue = condition.getValue();
 
         return switch (condition.getOperator()) {

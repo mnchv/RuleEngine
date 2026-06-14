@@ -4,7 +4,7 @@ import dev.zetta.interview.RuleEngine.entity.MessageState;
 import dev.zetta.interview.RuleEngine.repository.MessageStateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @Service
 @RequiredArgsConstructor
