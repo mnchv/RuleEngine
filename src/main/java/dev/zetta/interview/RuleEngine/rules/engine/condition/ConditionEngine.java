@@ -24,35 +24,36 @@ public class ConditionEngine {
     }
 
     public boolean evaluate(JsonNode input) {
+        System.out.println("Evaluating message body...");
         return evaluate(readConditions(), input);
     }
 
-    private boolean evaluate(Condition condition, JsonNode input) {
-        if (!condition.isNested()) return compareValues(condition, input);
+    private boolean evaluate(Condition condition, JsonNode inputMessage) {
+        if (!condition.isNested()) return compareValues(condition, inputMessage);
 
         return switch (condition.getLogicalOperator()) {
-            case "all" -> Arrays.stream(condition.getConditions()).allMatch(c -> evaluate(c, input));
-            case "any" -> Arrays.stream(condition.getConditions()).anyMatch(c -> evaluate(c, input));
-            case "none" -> Arrays.stream(condition.getConditions()).noneMatch(c -> evaluate(c, input));
+            case "all" -> Arrays.stream(condition.getConditions()).allMatch(c -> evaluate(c, inputMessage));
+            case "any" -> Arrays.stream(condition.getConditions()).anyMatch(c -> evaluate(c, inputMessage));
+            case "none" -> Arrays.stream(condition.getConditions()).noneMatch(c -> evaluate(c, inputMessage));
             default -> throw new ConditionEvaluationException("Unexpected logical operator: " + condition.getLogicalOperator());
         };
     }
 
-    private boolean compareValues(Condition condition, JsonNode input) {
-        JsonNode value = input.get(condition.getField());
-        if (value == null) throw new ConditionEvaluationException("Field expected, but missing from input: " + condition.getField());
+    private boolean compareValues(Condition condition, JsonNode inputMessage) {
+        JsonNode inputMessageField = inputMessage.get(condition.getField());
+        if (inputMessageField == null) throw new ConditionEvaluationException("Field expected, but missing from input message: " + condition.getField());
 
-        String actualValue = value.asString();
-        String expectedValue = condition.getValue();
+        String currentValue = inputMessageField.asString();
+        String compareValue = condition.getValue();
 
         return switch (condition.getOperator()) {
-            case "==" -> Objects.equals(actualValue, expectedValue);
-            case "!==" -> !Objects.equals(actualValue, expectedValue);
-            case ">" -> Long.parseLong(actualValue) > Long.parseLong(expectedValue);
-            case ">=" -> Long.parseLong(actualValue) >= Long.parseLong(expectedValue);
-            case "<" -> Long.parseLong(actualValue) < Long.parseLong(expectedValue);
-            case "<=" -> Long.parseLong(actualValue) <= Long.parseLong(expectedValue);
-            default -> throw new ConditionEvaluationException("Unexpected value: " + condition.getOperator());
+            case "==" -> Objects.equals(currentValue, compareValue);
+            case "!==" -> !Objects.equals(currentValue, compareValue);
+            case ">" -> Long.parseLong(currentValue) > Long.parseLong(compareValue);
+            case ">=" -> Long.parseLong(currentValue) >= Long.parseLong(compareValue);
+            case "<" -> Long.parseLong(currentValue) < Long.parseLong(compareValue);
+            case "<=" -> Long.parseLong(currentValue) <= Long.parseLong(compareValue);
+            default -> throw new ConditionEvaluationException("Unexpected operator: " + condition.getOperator());
         };
     }
 }

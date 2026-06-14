@@ -23,34 +23,33 @@ public class TransformationEngine {
         return objectMapper.treeToValue(transformations, Transformation[].class);
     }
 
-    public JsonNode transform(JsonNode input) {
-        ObjectNode object = (ObjectNode) input;
-        Transformation[] transformations = readTransformations();
+    public JsonNode transform(JsonNode inputMessage) {
+        System.out.println("Proceeding with message transformation...");
 
-        for (Transformation transformation : transformations) apply(transformation, object);
+        for (Transformation transformation : readTransformations()) apply(transformation, (ObjectNode) inputMessage);
 
-        return object;
+        return inputMessage;
     }
 
-    private void apply(Transformation transformation, ObjectNode input) {
+    private void apply(Transformation transformation, ObjectNode inputMessage) {
         switch (transformation.getOperation()) {
             case "put":
                 insertValueAtTargetPath(
-                        input,
+                        inputMessage,
                         transformation.getTarget(),
-                        resolveExpression(transformation.getExpression(), input)
+                        resolveExpression(transformation.getExpression(), inputMessage)
                 );
                 break;
             case "update":
                 updateValueAtTargetPath(
-                        input,
+                        inputMessage,
                         transformation.getTarget(),
-                        resolveExpression(transformation.getExpression(), input)
+                        resolveExpression(transformation.getExpression(), inputMessage)
                 );
                 break;
             case "remove":
                 removeValueAtTargetPath(
-                        input,
+                        inputMessage,
                         transformation.getTarget()
                 );
                 break;
@@ -59,16 +58,16 @@ public class TransformationEngine {
         }
     }
 
-    private String resolveExpression(TransformationExpression expression, ObjectNode input) {
+    private String resolveExpression(TransformationExpression expression, ObjectNode inputMessage) {
         return switch (expression.getFunction()) {
             case "create", "replace" -> String.valueOf(expression.getArgs().getFirst());
-            case "add" -> expression.add(input);
-            case "subtract" -> expression.subtract(input);
-            case "multiply" -> expression.multiply(input);
-            case "divide" -> expression.divide(input);
-            case "concat" -> expression.concat(input);
-            case "uppercase" -> expression.uppercase(input);
-            case "lowercase" -> expression.lowercase(input);
+            case "add" -> expression.add(inputMessage);
+            case "subtract" -> expression.subtract(inputMessage);
+            case "multiply" -> expression.multiply(inputMessage);
+            case "divide" -> expression.divide(inputMessage);
+            case "concat" -> expression.concat(inputMessage);
+            case "uppercase" -> expression.uppercase(inputMessage);
+            case "lowercase" -> expression.lowercase(inputMessage);
             default -> throw new TransformationExpressionException("Unexpected expression function: " + expression.getFunction());
         };
     }

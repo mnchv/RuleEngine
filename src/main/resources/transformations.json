@@ -12,7 +12,7 @@
   },
   {
     "operation": "update",
-    "target": "user.address",
+    "target": "user.age",
     "expression": {
       "function": "add",
       "args": [
