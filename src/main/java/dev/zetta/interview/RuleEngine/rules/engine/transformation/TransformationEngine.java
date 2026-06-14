@@ -31,6 +31,14 @@ public class TransformationEngine {
         return inputMessage;
     }
 
+    public JsonNode transform(JsonNode inputMessage, Transformation[] transformations) {
+        System.out.println("Proceeding with message transformation...");
+
+        for (Transformation transformation : transformations) apply(transformation, (ObjectNode) inputMessage);
+
+        return inputMessage;
+    }
+
     private void apply(Transformation transformation, ObjectNode inputMessage) {
         switch (transformation.getOperation()) {
             case "put":

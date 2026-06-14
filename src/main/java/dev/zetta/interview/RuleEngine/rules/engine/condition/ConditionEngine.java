@@ -28,7 +28,7 @@ public class ConditionEngine {
         return evaluate(readConditions(), input);
     }
 
-    private boolean evaluate(Condition condition, JsonNode inputMessage) {
+    public boolean evaluate(Condition condition, JsonNode inputMessage) {
         if (!condition.isNested()) return compareValues(condition, inputMessage);
 
         return switch (condition.getLogicalOperator()) {
@@ -40,7 +40,7 @@ public class ConditionEngine {
     }
 
     private boolean compareValues(Condition condition, JsonNode inputMessage) {
-        JsonNode inputMessageField = inputMessage.get(condition.getField());
+        JsonNode inputMessageField = inputMessage.at(mapToJsonPath(condition.getField()));
         if (inputMessageField == null) throw new ConditionEvaluationException("Field expected, but missing from input message: " + condition.getField());
 
         String currentValue = inputMessageField.asString();
@@ -55,5 +55,9 @@ public class ConditionEngine {
             case "<=" -> Long.parseLong(currentValue) <= Long.parseLong(compareValue);
             default -> throw new ConditionEvaluationException("Unexpected operator: " + condition.getOperator());
         };
+    }
+
+    private String mapToJsonPath(Object path) {
+        return "/" + path.toString().replace(".", "/");
     }
 }
