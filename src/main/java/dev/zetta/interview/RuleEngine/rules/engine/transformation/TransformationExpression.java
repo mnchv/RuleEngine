@@ -1,5 +1,6 @@
 package dev.zetta.interview.RuleEngine.rules.engine.transformation;
 
+import dev.zetta.interview.RuleEngine.exceptions.TransformationExpressionException;
 import lombok.Getter;
 import lombok.Setter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,6 +35,9 @@ public class TransformationExpression {
     public String divide(ObjectNode input) {
         long currentValue = input.at(mapToJsonPath(args.getFirst())).asLong();
         long newValue = ((Number) args.getLast()).longValue();
+
+        if (newValue == 0) throw new TransformationExpressionException("Can't divide 0");
+
         return String.valueOf(currentValue / newValue);
     }
 

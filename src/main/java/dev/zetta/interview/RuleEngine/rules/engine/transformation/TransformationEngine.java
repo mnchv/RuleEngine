@@ -1,5 +1,6 @@
 package dev.zetta.interview.RuleEngine.rules.engine.transformation;
 
+import dev.zetta.interview.RuleEngine.exceptions.ConfigurationException;
 import dev.zetta.interview.RuleEngine.exceptions.TransformationApplyException;
 import dev.zetta.interview.RuleEngine.exceptions.TransformationExpressionException;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +22,16 @@ public class TransformationEngine {
     @Value("${app.transformations.path}")
     private File transformationsFile;
 
-    private Transformation[] readTransformations() throws IOException {
-        JsonNode transformations = objectMapper.readTree(transformationsFile);
-        return objectMapper.treeToValue(transformations, Transformation[].class);
+    private Transformation[] readTransformations() {
+        try {
+            JsonNode transformations = objectMapper.readTree(transformationsFile);
+            return objectMapper.treeToValue(transformations, Transformation[].class);
+        } catch (IOException e) {
+            throw new ConfigurationException("Transformations configuration file could not be loaded: " + e.getMessage());
+        }
     }
 
-    public JsonNode transform(JsonNode inputMessage) throws IOException {
+    public JsonNode transform(JsonNode inputMessage) {
         log.info("Proceeding with message transformation...");
 
         for (Transformation transformation : readTransformations()) apply(transformation, (ObjectNode) inputMessage);
@@ -100,7 +105,7 @@ public class TransformationEngine {
         }
 
         if (rootNode.get(nodes[nodes.length - 1]) == null)
-            throw new TransformationApplyException("Can't update non existant field: " + nodes[nodes.length - 1]);
+            throw new TransformationApplyException("Can't update non existent field: " + nodes[nodes.length - 1]);
         rootNode.put(nodes[nodes.length - 1], value);
     }
 

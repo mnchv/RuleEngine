@@ -1,6 +1,7 @@
 package dev.zetta.interview.RuleEngine.config;
 
-import dev.zetta.interview.RuleEngine.exceptions.ConditionEvaluationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import dev.zetta.interview.RuleEngine.exceptions.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.listener.DefaultErrorHandler;
@@ -14,7 +15,12 @@ public class KafkaConsumerConfig {
         DefaultErrorHandler handler = new DefaultErrorHandler(new FixedBackOff(1000L, 4L));
 
         handler.addNotRetryableExceptions(
-                ConditionEvaluationException.class
+                ConditionEvaluationException.class,
+                MessageEvaluationException.class,
+                TransformationApplyException.class,
+                TransformationExpressionException.class,
+                ConfigurationException.class,
+                JsonProcessingException.class
         );
 
         return handler;
