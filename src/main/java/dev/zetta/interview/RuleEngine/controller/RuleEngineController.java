@@ -1,6 +1,6 @@
 package dev.zetta.interview.RuleEngine.controller;
 
-import dev.zetta.interview.RuleEngine.config.KafkaTopicProperties;
+import dev.zetta.interview.RuleEngine.config.KafkaInputTopicProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class RuleEngineController {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final KafkaTopicProperties kafkaTopicProperties;
+    private final KafkaInputTopicProperties kafkaInputTopicProperties;
 
-    @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> sendMessageToTopic(@RequestBody String body) {
-        kafkaTemplate.send(kafkaTopicProperties.inputTopic(), body);
+        kafkaTemplate.send(kafkaInputTopicProperties.name(), body);
         return ResponseEntity.ok("Message received: \n" + body);
     }
 }

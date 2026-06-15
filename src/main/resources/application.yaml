@@ -28,8 +28,17 @@ spring:
 
 app:
   kafka:
-    input-topic: input
-    output-topic: output
+    topics:
+      input:
+        name: input
+        partitions: 1
+        replicas: 1
+        group-id: input-processors
+      output:
+        name: output
+        partitions: 1
+        replicas: 1
+        group-id: output-processors
   conditions:
     path: classpath:rules/conditions.json
   transformations:

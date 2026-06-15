@@ -1,6 +1,7 @@
 package dev.zetta.interview.RuleEngine.service;
 
-import dev.zetta.interview.RuleEngine.config.KafkaTopicProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import dev.zetta.interview.RuleEngine.config.KafkaOutputTopicProperties;
 import dev.zetta.interview.RuleEngine.exceptions.MessageEvaluationException;
 import dev.zetta.interview.RuleEngine.rules.engine.condition.ConditionEngine;
 import dev.zetta.interview.RuleEngine.rules.engine.transformation.TransformationEngine;
@@ -11,8 +12,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +24,10 @@ public class RuleEngineService {
     private final PersistenceService persistenceService;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final KafkaTopicProperties kafkaTopicProperties;
+    private final KafkaOutputTopicProperties kafkaOutputTopicProperties;
 
-    @KafkaListener(topics = "${app.kafka.input-topic}", groupId = "default")
-    public void onMessageReceive(String message) throws IOException {
+    @KafkaListener(topics = "${app.kafka.topics.input.name}", groupId = "${app.kafka.topics.input.group-id}")
+    public void onMessageReceive(String message) throws JsonProcessingException {
         log.info("Message received: \n{}", message);
         JsonNode inputMessage = objectMapper.readTree(message);
 
@@ -37,10 +36,10 @@ public class RuleEngineService {
         if (outputMessage != null) {
             persistenceService.save(outputMessage);
 
-            kafkaTemplate.send(kafkaTopicProperties.outputTopic(), outputMessage.toString());
+            kafkaTemplate.send(kafkaOutputTopicProperties.name(), objectMapper.writeValueAsString(outputMessage));
             log.info("Message sent to output topic: \n{}", outputMessage.toPrettyString());
         } else {
-            throw new MessageEvaluationException("Message body did non pass evaluation test");
+            throw new MessageEvaluationException("Message body did not pass evaluation test");
         }
     }
 }
