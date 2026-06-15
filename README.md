@@ -8,6 +8,8 @@
     ```bash
    ./mvnw spring-boot:run
     ```
+3. Send a message to http://localhost:8080/api/v1/messages for processing
+   * Messages are send via POST request with a JSON body (see [input](#input))
    
 The app will start on port 8080 with:
 - H2 file-based database at ./data/db
