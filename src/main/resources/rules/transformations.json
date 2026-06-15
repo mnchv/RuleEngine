@@ -23,16 +23,6 @@
   },
   {
     "operation": "remove",
-    "target": "user.firstName"
-  },
-  {
-    "operation": "update",
-    "target": "user.age",
-    "expression": {
-      "function": "replace",
-      "args": [
-        22
-      ]
-    }
+    "target": "user.lol"
   }
 ]

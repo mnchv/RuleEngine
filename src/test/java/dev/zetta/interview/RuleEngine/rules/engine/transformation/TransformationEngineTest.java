@@ -1,9 +1,11 @@
 package dev.zetta.interview.RuleEngine.rules.engine.transformation;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import dev.zetta.interview.RuleEngine.service.PersistenceService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TransformationEngineTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Mock
+    private PersistenceService persistenceService;
 
     @InjectMocks
     private TransformationEngine transformationEngine;

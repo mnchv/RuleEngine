@@ -124,6 +124,10 @@ public class TransformationEngine {
         for (int i = 0; i < nodes.length - 1; i++) {
             rootNode = rootNode.withObject(nodes[i]);
         }
+
+        if (rootNode.get(nodes[nodes.length - 1]) == null)
+            throw new TransformationApplyException("Can't remove non existent field: " + nodes[nodes.length - 1]);
+
         rootNode.remove(nodes[nodes.length - 1]);
     }
 }

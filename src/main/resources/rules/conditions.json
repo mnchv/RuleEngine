@@ -2,7 +2,7 @@
   "logicalOperator": "all",
   "conditions": [
     {
-      "field": "age",
+      "field": "user.age",
       "operator": ">=",
       "value": 18
     },
@@ -10,12 +10,12 @@
       "logicalOperator": "any",
       "conditions": [
         {
-          "field": "total",
+          "field": "user.totalBalance",
           "operator": "==",
           "value": 50
         },
         {
-          "field": "total",
+          "field": "user.totalBalance",
           "operator": "==",
           "value": 100
         }

@@ -36,7 +36,7 @@ public class RuleEngineService {
             kafkaTemplate.send(kafkaOutputTopicProperties.name(), objectMapper.writeValueAsString(outputMessage));
             log.info("Message sent to output topic: \n{}", outputMessage.toPrettyString());
         } else {
-            throw new MessageEvaluationException("Message body did not pass evaluation test");
+            log.error("Message did not pass evaluation test");
         }
     }
 }
