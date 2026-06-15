@@ -1,8 +1,11 @@
 package dev.zetta.interview.RuleEngine.rules.engine.transformation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import dev.zetta.interview.RuleEngine.exceptions.ConfigurationException;
 import dev.zetta.interview.RuleEngine.exceptions.TransformationApplyException;
 import dev.zetta.interview.RuleEngine.exceptions.TransformationExpressionException;
+import dev.zetta.interview.RuleEngine.service.PersistenceService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,9 +18,12 @@ import java.io.IOException;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TransformationEngine {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final PersistenceService persistenceService;
 
     @Value("${app.transformations.path}")
     private File transformationsFile;
@@ -31,7 +37,7 @@ public class TransformationEngine {
         }
     }
 
-    public JsonNode transform(JsonNode inputMessage) {
+    public JsonNode transform(JsonNode inputMessage) throws JsonProcessingException {
         log.info("Proceeding with message transformation...");
 
         for (Transformation transformation : readTransformations()) apply(transformation, (ObjectNode) inputMessage);
@@ -39,7 +45,7 @@ public class TransformationEngine {
         return inputMessage;
     }
 
-    public JsonNode transform(JsonNode inputMessage, Transformation[] transformations) {
+    public JsonNode transform(JsonNode inputMessage, Transformation[] transformations) throws JsonProcessingException {
         log.info("Proceeding with message transformation...");
 
         for (Transformation transformation : transformations) apply(transformation, (ObjectNode) inputMessage);
@@ -47,7 +53,7 @@ public class TransformationEngine {
         return inputMessage;
     }
 
-    private void apply(Transformation transformation, ObjectNode inputMessage) {
+    private void apply(Transformation transformation, ObjectNode inputMessage) throws JsonProcessingException {
         switch (transformation.getOperation()) {
             case "put":
                 insertValueAtTargetPath(
@@ -72,6 +78,8 @@ public class TransformationEngine {
             default:
                 throw new TransformationApplyException("Unexpected operation: " + transformation.getOperation());
         }
+
+        persistenceService.save(inputMessage);
     }
 
     private String resolveExpression(TransformationExpression expression, ObjectNode inputMessage) {

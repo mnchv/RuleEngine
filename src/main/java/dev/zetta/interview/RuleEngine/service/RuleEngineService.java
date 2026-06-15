@@ -21,7 +21,6 @@ public class RuleEngineService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ConditionEngine conditionEngine;
     private final TransformationEngine transformationEngine;
-    private final PersistenceService persistenceService;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final KafkaOutputTopicProperties kafkaOutputTopicProperties;
@@ -34,8 +33,6 @@ public class RuleEngineService {
         JsonNode outputMessage = conditionEngine.evaluate(inputMessage) ? transformationEngine.transform(inputMessage) : null;
 
         if (outputMessage != null) {
-            persistenceService.save(outputMessage);
-
             kafkaTemplate.send(kafkaOutputTopicProperties.name(), objectMapper.writeValueAsString(outputMessage));
             log.info("Message sent to output topic: \n{}", outputMessage.toPrettyString());
         } else {
