@@ -4,6 +4,7 @@ import dev.zetta.interview.RuleEngine.exceptions.ConditionEvaluationException;
 import dev.zetta.interview.RuleEngine.exceptions.ConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,11 +20,11 @@ public class ConditionEngine {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${app.conditions.path}")
-    private File conditionsFile;
+    private Resource conditionsFile;
 
     private Condition readConditions() {
         try {
-            JsonNode conditions = objectMapper.readTree(conditionsFile);
+            JsonNode conditions = objectMapper.readTree(conditionsFile.getInputStream());
             return objectMapper.treeToValue(conditions, Condition.class);
         } catch (IOException e) {
             throw new ConfigurationException("Conditions configuration file could not be loaded: " + e.getMessage());

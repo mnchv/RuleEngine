@@ -19,7 +19,7 @@ public class PersistenceService {
     private final MessageStateRepository repository;
 
     public void save(JsonNode payload) throws JsonProcessingException {
-        log.info("Persisting message state...");
+        log.info("Transformation rule applied. Persisting message state...");
 
         MessageState messageState = new MessageState();
 

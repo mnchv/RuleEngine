@@ -8,6 +8,7 @@ import dev.zetta.interview.RuleEngine.service.PersistenceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,11 +27,11 @@ public class TransformationEngine {
     private final PersistenceService persistenceService;
 
     @Value("${app.transformations.path}")
-    private File transformationsFile;
+    private Resource transformationsFile;
 
     private Transformation[] readTransformations() {
         try {
-            JsonNode transformations = objectMapper.readTree(transformationsFile);
+            JsonNode transformations = objectMapper.readTree(transformationsFile.getInputStream());
             return objectMapper.treeToValue(transformations, Transformation[].class);
         } catch (IOException e) {
             throw new ConfigurationException("Transformations configuration file could not be loaded: " + e.getMessage());
@@ -38,7 +39,7 @@ public class TransformationEngine {
     }
 
     public JsonNode transform(JsonNode inputMessage) throws JsonProcessingException {
-        log.info("Proceeding with message transformation...");
+        log.info("Evaluation successful. Proceeding with message transformation...");
 
         for (Transformation transformation : readTransformations()) apply(transformation, (ObjectNode) inputMessage);
 
@@ -46,7 +47,7 @@ public class TransformationEngine {
     }
 
     public JsonNode transform(JsonNode inputMessage, Transformation[] transformations) throws JsonProcessingException {
-        log.info("Proceeding with message transformation...");
+        log.info("Evaluation successful. Proceeding with message transformation...");
 
         for (Transformation transformation : transformations) apply(transformation, (ObjectNode) inputMessage);
 
